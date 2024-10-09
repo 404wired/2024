@@ -1,30 +1,3 @@
-"""
-This is the default BEST Robotics program for the Gizmo.
-This program offers remote control of simple robots using 3 motors and a servo.
-This may serve as a useful starting point for your team's competition code. You
-will almost certainly need to edit or extend this code to meet your needs.
-
-This code has two control modes: 'Tank Mode' and 'Arcade Mode'. The Start
-button on your gamepad switches the robot between the two modes.
-
-Here are the controls for Tank Mode:
-Left Joystick Up/Down    - Motor 1 Fwd/Rev
-Right Joystick Up/Down   - Motor 3 Fwd/Rev
-
-Here are the controls for Arcade Mode:
-Left Joystick Up/Down    - Robot Fwd/Rev
-Left Joystick Left/Right - Robot Turn Left/Right
-
-These controls work in both modes:
-Right Trigger            - Motor 4 Forward
-Right Shoulder Button    - Motor 4 Reverse
-Left Trigger             - Servo 1 to 0 degrees
-Left Shoulder Button     - Servo 1 to 90 degrees
-
-When neither the left trigger nor shoulder button are pressed, the servo will
-go to 45 degrees.
-"""
-
 import time as t
 import board
 import pwmio
@@ -32,7 +5,7 @@ import digitalio
 from adafruit_motor import servo
 from adafruit_simplemath import map_range, constrain
 from circuitpython_gizmo import Gizmo
-
+from auton import driveForward, driveTurnLeft, driveTurnRight
 
 BUTTON_BLANKING_PERIOD = 0.7
 blanking_period_start = t.monotonic()
@@ -82,6 +55,7 @@ prev_start_button = False
 
 # Keep running forever
 while True:
+
     # Toggle the built-in LED each time through the loop so we can see
     # that the program really is running.
     builtin_led.value = not builtin_led.value
@@ -100,11 +74,11 @@ while True:
     if mode == TANK_MODE:
         # Convert gamepad axis positions (0 - 255) to motor speeds (-1.0 - 1.0)
         # looks wrong but correct
-        motor_left.throttle = map_range(gizmo.axes.dpad_y, 0, 255, -1.0, 1.0)
+        motor_left.throttle = map_range(gizmo.axes.left_y, 0, 255, -1.0, 1.0)
         motor_right.throttle = map_range(gizmo.axes.right_y, 0, 255, -1.0, 1.0)
     elif mode == ARCADE_MODE:
         # Mix right joystick axes to control both wheels
-        speed = map_range(gizmo.axes.dpad_y, 0, 255, -1.0, 1.0)
+        speed = map_range(gizmo.axes.left_y, 0, 255, -1.0, 1.0)
         steering = map_range(gizmo.axes.right_x, 0, 255, -1.0, 1.0)
         motor_left.throttle = constrain(speed - steering, -1.0, 1.0)
         motor_right.throttle = constrain(speed + steering, -1.0, 1.0)
@@ -122,12 +96,21 @@ while True:
     SERVO_OUT_VALUE = 90
 
     duration = t.monotonic() - blanking_period_start
-    print(duration)
     if gizmo.buttons.b and duration > BUTTON_BLANKING_PERIOD:
         blanking_period_start = t.monotonic()
         servo_task.angle = SERVO_OUT_VALUE
         t.sleep(.3)
         servo_task.angle = SERVO_IN_VALUE
 
-
-
+    if gizmo.buttons.y:
+       print("driving forward")
+       driveForward(5, motor_left, motor_right)
+       print("sleeping...")
+       t.sleep(1)
+       print("turning left")
+       driveTurnLeft(5, motor_left, motor_right)
+       print("sleeping...")
+       t.sleep(1)
+       print("turning left")
+       driveTurnRight(5, motor_left, motor_right)
+       print("auton finished")
