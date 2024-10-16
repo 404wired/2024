@@ -43,9 +43,11 @@ while True:
         robot.stop_forklift()
 
     duration = t.monotonic() - blanking_period_start
+    # parameter that allows the servo moves
     if gizmo.buttons.b and duration > BUTTON_BLANKING_PERIOD:
         blanking_period_start = t.monotonic()
         robot.eject_habitat()
 
+    # activates autonomous task
     if gizmo.buttons.y and gizmo.buttons.a:
         doAutonA(robot)

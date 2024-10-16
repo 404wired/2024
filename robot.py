@@ -8,8 +8,9 @@ class Robot:
     """Provides functions to manipulate robot.
     """
     def __init__(self):
-        """Variables for the motor and servos. 
+        """Variables for the motor and servos.
         """
+        # assigns values for motor and servo variables
         self.left_motor = None
         self.right_motor = None
         self.forklift_motor = None
@@ -31,11 +32,12 @@ class Robot:
         """Makes a motor.
 
         Args:
-            addr (_type_): A port to use for motor.
+            addr (_type_): Assigns a port to the motor.
 
         Returns:
             _type_: Created motor.
         """
+        # sets parameters for motor
         motor = servo.ContinuousServo(
             pwmio.PWMOut(addr, frequency=self.pwm_freq),
             min_pulse=self.min_pulse,
@@ -43,15 +45,16 @@ class Robot:
         )
         return motor
 
-    def _make_servo(self, addr): 
+    def _make_servo(self, addr):
         """Makes a servo.
 
         Args:
-            addr (_type_): Provides a port for the servo.
+            addr (_type_): Assigns a port to the servo.
 
         Returns:
             _type_: Created servo.
         """
+        # sets parameters for the servo
         a_servo = servo.Servo(
             pwmio.PWMOut(addr, frequency=self.pwm_freq),
             actuation_range=self.servo_range,
@@ -61,23 +64,26 @@ class Robot:
         return a_servo
 
     def drive_base_arcade(self, speed, heading):
-        """Sets drive mode to arcade.
+        """Drive's the robot.
 
         Args:
             speed (_type_): Sets speed.
             heading (_type_): Sets heading.
 
         Raises:
-            Exception: Prevents error if motor is not made. 
+            Exception: Prevents error if motor is not created.
         """
         if not self.left_motor or not self.right_motor:
             raise Exception("Robot not initialized")
 
+        # Filtering speed and heading
         speed_filtered = self.speed_filter.filter(speed)
         heading_filtered = self.heading_filter.filter(heading)
 
+        # constrain the speed values
         left_speed = constrain(speed_filtered + heading_filtered, -1.0, 1.0)
         right_speed = constrain(speed_filtered - heading_filtered, -1.0, 1.0)
+        # assigns speed to motors
         self.left_motor.throttle = -1*left_speed
         self.right_motor.throttle = -1*right_speed
 
@@ -90,8 +96,10 @@ class Robot:
         if not self.left_motor or not self.right_motor:
             raise Exception("Robot not initialized")
 
+        # Resets memory values in speed filter
         self.speed_filter.reset()
         self.heading_filter.reset()
+        # assigns motors throttle 0 to stop robot
         self.left_motor.throttle = 0.0
         self.right_motor.throttle = 0.0
 
@@ -99,14 +107,14 @@ class Robot:
         """Makes the forklift move.
 
         Args:
-            speed (_type_): Gives speed to the forklift. 
+            speed (_type_): Speed to move the forklift.
 
         Raises:
-            Exception: Does not allow the forklift to move if it is not made.
+            Exception: Prevents error if motor is not made.
         """
         if not self.forklift_motor:
             raise Exception("Robot not initialized")
-        
+
         forklift_speed = constrain(speed, -1.0, 1.0)
         self.forklift_motor.throttle = forklift_speed
 
@@ -128,6 +136,7 @@ class Robot:
     def eject_habitat(self):
         """Makes servo move to eject habitat modules.
         """
+        # moves servo
         self.box_servo.angle = self.SERVO_OUT_VALUE
         t.sleep(0.3)
         self.box_servo.angle = self.SERVO_IN_VALUE
@@ -142,6 +151,7 @@ def make_manny(gizmo):
     Returns:
         _type_: Makes robot.
     """
+    # assigns ports for motors and servo
     robot = Robot()
     robot.left_motor = robot._make_motor(gizmo.MOTOR_1)
     robot.right_motor = robot._make_motor(gizmo.MOTOR_3)

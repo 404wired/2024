@@ -1,5 +1,5 @@
 class Filter():
-    """Implements the Alpha Beta Filter, 
+    """Implements the Alpha Beta Filter,
     for more information please see this reference;
     https://en.wikipedia.org/wiki/Alpha_beta_filter
     """
