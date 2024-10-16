@@ -49,5 +49,5 @@ while True:
         robot.eject_habitat()
 
     # activates autonomous task
-    if gizmo.buttons.y and gizmo.buttons.a:
+    if gizmo.buttons.left_stick and gizmo.buttons.right_stick:
         doAutonA(robot)

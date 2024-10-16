@@ -26,7 +26,7 @@ def driveTurnLeft(duration, robot):
         robot (_type_): The robot object.
     """
    # code for turning the robot left and how the angle it turns to.
-   print(f" * Turning left for {duration}s")
+    print(f" * Turning left for {duration}s")
     start = t.monotonic()
     elapsed = t.monotonic() - start
     while elapsed < duration:
@@ -58,6 +58,7 @@ def driveForklift(duration, speed, robot):
         speed (_type_): The speed that the forklift moves at.
         robot (_type_): The robot object.
 
+    """
     # the code that moves the forklift and the duration the forklift moves for.
     print(f" * Driving forklift with speed {speed} for {duration}s")
     start = t.monotonic()
