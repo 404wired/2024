@@ -1,4 +1,8 @@
 class Filter():
+    """Implements the Alpha Beta Filter, 
+    for more information please see this reference;
+    https://en.wikipedia.org/wiki/Alpha_beta_filter
+    """
     def __init__(self, dt=0.5, alpha=0.012, beta=0.0):
         self.dt = dt
         self.alpha = alpha
@@ -7,6 +11,14 @@ class Filter():
         self.reset()
 
     def filter(self, xm):
+        """Filters a signal.
+
+        Args:
+            xm (_type_): Signal you want to filter.
+
+        Returns:
+            _type_: A filtered signal.
+        """
         xk = self.xk_1 + (self.vk_1 * self.dt)
         vk = self.vk_1
 
@@ -21,5 +33,7 @@ class Filter():
         return xk
 
     def reset(self):
+        """Resets the memory of the filter.
+        """
         self.xk_1 = 0.0
         self.vk_1 = 0.0
