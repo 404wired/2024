@@ -42,8 +42,8 @@ while True:
     else:
         robot.stop_forklift()
 
-    duration = t.monotonic() - blanking_period_start
     # parameter that allows the servo moves
+    duration = t.monotonic() - blanking_period_start
     if gizmo.buttons.b and duration > BUTTON_BLANKING_PERIOD:
         blanking_period_start = t.monotonic()
         robot.eject_habitat()
@@ -51,3 +51,9 @@ while True:
     # activates autonomous task
     if gizmo.buttons.left_stick and gizmo.buttons.right_stick:
         doAutonA(robot)
+
+    # move tennis ball grabber
+    tennis_duration = t.monotonic() - blanking_period_start
+    if gizmo.buttons.x and tennis_duration > BUTTON_BLANKING_PERIOD:
+        blanking_period_start = t.monotonic()
+        robot.grab_tennis_ball()

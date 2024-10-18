@@ -16,6 +16,7 @@ class Robot:
         self.forklift_motor = None
         self.collection_motor = None
         self.box_servo = None
+        self.tennis_servo = None
 
         self.pwm_freq = 50  # Hertz
         self.min_pulse = 1000  # milliseconds
@@ -24,6 +25,8 @@ class Robot:
 
         self.SERVO_IN_VALUE = 0
         self.SERVO_OUT_VALUE = 120
+
+        self.is_servo_grabbing = False
 
         self.speed_filter = Filter()
         self.heading_filter = Filter()
@@ -141,6 +144,14 @@ class Robot:
         t.sleep(0.3)
         self.box_servo.angle = self.SERVO_IN_VALUE
 
+    def grab_tennis_ball(self):
+
+        if self.is_servo_grabbing:
+            self.tennis_servo.angle = self.SERVO_OUT_VALUE
+            self.is_servo_grabbing = False
+        else:
+            self.tennis_servo.angle = self.SERVO_IN_VALUE
+            self.is_servo_grabbing = True
 
 def make_manny(gizmo):
     """Assigns ports for motors and servo.
@@ -158,5 +169,6 @@ def make_manny(gizmo):
     robot.forklift_motor = robot._make_motor(gizmo.MOTOR_2)
     # robot.collection_motor = robot._make_motor(gizmo.MOTOR_0)
     robot.box_servo = robot._make_servo(gizmo.SERVO_1)
+    robot.tennis_servo = robot._make_servo(gizmo.SERVO_3)
 
     return robot
