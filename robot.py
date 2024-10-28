@@ -26,7 +26,7 @@ class Robot:
         self.SERVO_IN_VALUE = 0
         self.SERVO_OUT_VALUE = 120
 
-        self.SERVO_IN_VALUE_STICK = 30
+        self.SERVO_IN_VALUE_STICK = 10
         self.SERVO_OUT_VALUE_STICK = 120
 
         self.is_servo_grabbing = False
