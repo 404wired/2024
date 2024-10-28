@@ -8,6 +8,7 @@ from auton import doAutonA
 
 BUTTON_BLANKING_PERIOD = 0.7
 blanking_period_start = t.monotonic()
+blanking_period_start_stick = t.monotonic()
 
 # the Gizmo object provides access to the data that is held by the field
 # management system and the gizmo system processor
@@ -31,7 +32,7 @@ while True:
 
     # Mix right joystick axes to control both wheels
     speed = map_range(gizmo.axes.left_y, 0, 255, 1.0, -1.0)
-    heading = map_range(gizmo.axes.right_x, 0, 255, -1.0, 1.0)
+    heading = map_range(gizmo.axes.right_x, 0, 255, 1.0, -1.0)
     robot.drive_base_arcade(speed, heading)
 
     # Control task motor with right trigger / shoulder button
@@ -57,3 +58,8 @@ while True:
     if gizmo.buttons.x and tennis_duration > BUTTON_BLANKING_PERIOD:
         blanking_period_start = t.monotonic()
         robot.grab_tennis_ball()
+
+    stick_duration = t.monotonic() - blanking_period_start_stick
+    if gizmo.buttons.y and stick_duration > BUTTON_BLANKING_PERIOD:
+        blanking_period_start_stick = t.monotonic()
+        robot.move_stick()
