@@ -16,6 +16,11 @@ gizmo = Gizmo()
 
 robot = make_manny(gizmo)
 
+prev_start_button = False
+
+# start with the servo in the correct position so the boxes don't fall out
+robot.assign_servo_to_angle(robot.box_servo, robot.servo_in_value)
+
 # Configure the built-in LED pin as an output
 builtin_led = digitalio.DigitalInOut(board.GP25)
 builtin_led.direction = digitalio.Direction.OUTPUT
@@ -50,16 +55,13 @@ while True:
         robot.eject_habitat()
 
     # activates autonomous task
-    if gizmo.buttons.left_stick and gizmo.buttons.right_stick:
-        doAutonA(robot)
+    #if gizmo.buttons.left_stick and gizmo.buttons.right_stick:
+    #    doAutonA(robot)
 
-    # move tennis ball grabber
-    tennis_duration = t.monotonic() - blanking_period_start
-    if gizmo.buttons.x and tennis_duration > BUTTON_BLANKING_PERIOD:
-        blanking_period_start = t.monotonic()
-        robot.grab_tennis_ball()
-
-    stick_duration = t.monotonic() - blanking_period_start_stick
-    if gizmo.buttons.y and stick_duration > BUTTON_BLANKING_PERIOD:
-        blanking_period_start_stick = t.monotonic()
-        robot.move_stick()
+    # use the start button to switch if the filter is used or not
+    if gizmo.buttons.start and not prev_start_button:
+        if robot.use_filter:
+            print(robot.use_filter)
+        else:
+            print(robot.use_filter)
+    prev_start_button = gizmo.buttons.start

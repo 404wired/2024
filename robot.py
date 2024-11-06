@@ -16,24 +16,21 @@ class Robot:
         self.forklift_motor = None
         self.collection_motor = None
         self.box_servo = None
-        self.tennis_servo = None
 
         self.pwm_freq = 50  # Hertz
         self.min_pulse = 1000  # milliseconds
         self.max_pulse = 2000  # milliseconds
         self.servo_range = 120  # degrees
 
-        self.SERVO_IN_VALUE = 0
-        self.SERVO_OUT_VALUE = 120
+        self.servo_in_value = 55 # usually 0
+        self.servo_out_value = 0 # usually 120
 
-        self.SERVO_IN_VALUE_STICK = 10
-        self.SERVO_OUT_VALUE_STICK = 120
-
-        self.is_servo_grabbing = False
-        self.is_stick_down = False
+        self.is_servo_holding_modules = False
 
         self.speed_filter = Filter()
         self.heading_filter = Filter()
+
+        self.use_filter = True
 
     def _make_motor(self, addr):
         """Makes a motor.
@@ -83,13 +80,18 @@ class Robot:
         if not self.left_motor or not self.right_motor:
             raise Exception("Robot not initialized")
 
-        # Filtering speed and heading
-        speed_filtered = self.speed_filter.filter(speed)
-        heading_filtered = self.heading_filter.filter(heading)
+        if self.use_filter:
+            # Filtering speed and heading
+            speed_filtered = self.speed_filter.filter(speed)
+            heading_filtered = self.heading_filter.filter(heading)
 
-        # constrain the speed values
-        left_speed = constrain(speed_filtered + heading_filtered, -1.0, 1.0)
-        right_speed = constrain(speed_filtered - heading_filtered, -1.0, 1.0)
+            # constrain the speed values
+            left_speed = constrain(speed_filtered + heading_filtered, -1.0, 1.0)
+            right_speed = constrain(speed_filtered - heading_filtered, -1.0, 1.0)
+        else:
+            left_speed = constrain(speed + heading, -1.0, 1.0)
+            right_speed = constrain(speed - heading, -1.0, 1.0)
+
         # assigns speed to motors
         self.left_motor.throttle = -1*left_speed
         self.right_motor.throttle = -1*right_speed
@@ -140,31 +142,29 @@ class Robot:
         """
         self.drive_forklift(0.0)
 
+    def assign_servo_to_angle(self, servo, angle):
+
+        # ensure servo angle is within servo opperating range
+        if angle > self.servo_range or angle < 0:
+            raise Exception(f"Provided servo angle must be within 0-{self.servo_range}")
+
+        servo.angle = angle
+
     def eject_habitat(self):
         """Makes servo move to eject habitat modules.
         """
+        # old code that dispenses the modules
         # moves servo
-        self.box_servo.angle = self.SERVO_OUT_VALUE
-        t.sleep(0.3)
-        self.box_servo.angle = self.SERVO_IN_VALUE
+        # self.box_servo.angle = self.servo_out_value
+        # t.sleep(0.3)
+        # self.box_servo.angle = self.servo_in_value
 
-    def grab_tennis_ball(self):
-
-        if self.is_servo_grabbing:
-            self.tennis_servo.angle = self.SERVO_OUT_VALUE
-            self.is_servo_grabbing = False
+        if self.is_servo_holding_modules:
+            self.assign_servo_to_angle(self.box_servo, self.servo_out_value)
+            self.is_servo_holding_modules = False
         else:
-            self.tennis_servo.angle = self.SERVO_IN_VALUE
-            self.is_servo_grabbing = True
-
-    def move_stick(self):
-
-        if self.is_stick_down:
-            self.stick_servo.angle = self.SERVO_OUT_VALUE_STICK
-            self.is_stick_down = False
-        else:
-            self.stick_servo.angle = self.SERVO_IN_VALUE_STICK
-            self.is_stick_down = True
+            self.assign_servo_to_angle(self.box_servo, self.servo_in_value)
+            self.is_servo_holding_modules = True
 
 def make_manny(gizmo):
     """Assigns ports for motors and servo.
@@ -182,7 +182,5 @@ def make_manny(gizmo):
     robot.forklift_motor = robot._make_motor(gizmo.MOTOR_2)
     # robot.collection_motor = robot._make_motor(gizmo.MOTOR_0)
     robot.box_servo = robot._make_servo(gizmo.SERVO_1)
-    robot.tennis_servo = robot._make_servo(gizmo.SERVO_3)
-    robot.stick_servo = robot._make_servo(gizmo.SERVO_4)
 
     return robot
