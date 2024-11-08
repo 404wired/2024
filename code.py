@@ -48,7 +48,7 @@ while True:
     else:
         robot.stop_forklift()
 
-    # parameter that allows the servo moves
+    # logic that allows the servo move with a blanking period
     duration = t.monotonic() - blanking_period_start
     if gizmo.buttons.b and duration > BUTTON_BLANKING_PERIOD:
         blanking_period_start = t.monotonic()

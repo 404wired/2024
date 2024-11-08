@@ -22,7 +22,7 @@ class Robot:
         self.max_pulse = 2000  # milliseconds
         self.servo_range = 120  # degrees
 
-        self.servo_in_value = 55 # usually 0
+        self.servo_in_value = 45 # usually 0
         self.servo_out_value = 0 # usually 120
 
         self.is_servo_holding_modules = False
@@ -177,9 +177,9 @@ def make_manny(gizmo):
     """
     # assigns ports for motors and servo
     robot = Robot()
-    robot.left_motor = robot._make_motor(gizmo.MOTOR_1)
-    robot.right_motor = robot._make_motor(gizmo.MOTOR_3)
-    robot.forklift_motor = robot._make_motor(gizmo.MOTOR_2)
+    robot.left_motor = robot._make_motor(gizmo.MOTOR_2)
+    robot.right_motor = robot._make_motor(gizmo.MOTOR_1)
+    robot.forklift_motor = robot._make_motor(gizmo.MOTOR_3)
     # robot.collection_motor = robot._make_motor(gizmo.MOTOR_0)
     robot.box_servo = robot._make_servo(gizmo.SERVO_1)
 
